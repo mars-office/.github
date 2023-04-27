@@ -25,7 +25,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ inputs.tfVersion }}
-          cli_config_credentials_token: ${{ secrets.terraformToken }}
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_TEAM_TOKEN }}
       
       - name: Checkout
         uses: actions/checkout@v3
@@ -36,9 +36,6 @@ jobs:
           file: ${{ inputs.env }}/secrets.tfvars.json
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
-
-      - name: Test
-        run: cat ${{ inputs.env }}/secrets.tfvars.json
 
       - name: Terraform Init
         id: init
