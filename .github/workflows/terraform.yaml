@@ -127,3 +127,34 @@ jobs:
           name: tfplan
           path: ${{ inputs.env }}/tfplan
           
+
+  terraform_apply:
+    runs-on: ubuntu-latest
+    needs: [terraform_plan]
+    environment: ${{ inputs.env }}
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ inputs.tfVersion }}
+          cli_config_credentials_token: ${{ secrets.terraformToken }}
+      
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download tfplan
+        uses: actions/download-artifact@v3
+        with:
+          name: tfplan
+          path: ${{ inputs.env }}/tfplan
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ${{ inputs.env }}
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -input=false -no-color -auto-approve tfplan
+        working-directory: ${{ inputs.env }}
+      
