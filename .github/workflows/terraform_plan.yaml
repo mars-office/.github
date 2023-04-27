@@ -8,8 +8,8 @@ on:
         type: string
       tfVersion:
         required: false
-        type: number
-        default: 1.4.2
+        type: string
+        default: '1.4.2'
     secrets:
       terraformToken:
         required: true
