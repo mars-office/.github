@@ -24,6 +24,7 @@ env:
 jobs:
   terraform_plan:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
     permissions:
       pull-requests: write
     steps:
