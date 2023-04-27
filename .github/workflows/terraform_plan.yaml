@@ -5,11 +5,7 @@ on:
     inputs:
       env:
         required: true
-        type: choice
-        options:
-          - dev'
-          - uat
-          - prod
+        type: string
       tfVersion:
         required: false
         type: number
