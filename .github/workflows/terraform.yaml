@@ -37,10 +37,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-
-      - name: Replace Secrets in secrets.json file
-        
-
+      - name: Substitute Secrets
+        uses: Lambdaspire/action-substitute-secrets-in-file@v1.0.0
+        with:
+          file: ${{ inputs.env }}/secrets.tfvars.json
+          tokenPattern: ${TOKEN}
+          secretsJson: ${{ toJSON(secrets) }}
 
       - name: Terraform Format
         id: fmt
