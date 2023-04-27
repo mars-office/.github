@@ -24,7 +24,6 @@ env:
 jobs:
   terraform_plan:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.env }}
     permissions:
       pull-requests: write
     steps:
@@ -146,7 +145,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: tfplan
-          path: ${{ inputs.env }}/tfplan
+          path: ${{ inputs.env }}
 
       - name: Terraform Init
         id: init
