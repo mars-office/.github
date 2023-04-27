@@ -1,0 +1,8 @@
+{
+    "name": "TerraForm",
+    "description": "TerraForm MarsOffice Workflow",
+    "iconName": "tools",
+    "categories": [
+        "TerraForm"
+    ]
+}
