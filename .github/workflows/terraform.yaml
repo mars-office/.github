@@ -21,6 +21,7 @@ env:
 jobs:
   terraform_plan:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
     permissions:
       pull-requests: write
     steps:
@@ -129,6 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [terraform_plan]
     if: github.event_name != 'pull_request'
+    environment: ${{ inputs.env }}
     steps:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
