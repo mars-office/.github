@@ -37,6 +37,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+
+      - name: Replace Secrets in secrets.json file
+        
+
+
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check
@@ -54,7 +59,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -out=tfplan
+        run: terraform plan -no-color -input=false -var-file="secrets.tfvars.json" -out=tfplan
         continue-on-error: true
         working-directory: ${{ inputs.env }}
 
