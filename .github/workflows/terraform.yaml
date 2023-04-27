@@ -41,6 +41,9 @@ jobs:
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
 
+      - name: Test
+        run: cat ${{ inputs.env }}/secrets.tfvars.json
+
       - name: Terraform Init
         id: init
         run: terraform init
