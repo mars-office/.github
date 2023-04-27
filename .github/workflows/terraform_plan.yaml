@@ -19,7 +19,7 @@ on:
         required: true
 
 jobs:
-  tf_plan:
+  terraform_plan:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Terraform
