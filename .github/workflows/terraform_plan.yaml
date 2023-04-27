@@ -6,6 +6,9 @@ on:
       env:
         required: true
         type: string
+      appName:
+        required: true
+        type: string
       tfVersion:
         required: false
         type: string
@@ -15,7 +18,8 @@ on:
         required: true
 
 env:
-
+  TF_WORKSPACE: '${{ inputs.appName }}-${{ inputs.env }}'
+  TF_IN_AUTOMATION: 'true'
 
 jobs:
   terraform_plan:
