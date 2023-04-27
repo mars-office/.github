@@ -42,7 +42,7 @@ jobs:
           secretsJson: ${{ toJSON(secrets) }}
 
       - name: Test
-        run: cat ${{ inputs.env }}/secrets.tfvars.json
+        run: echo '${{ toJSON(secrets) }}'
 
       - name: Terraform Init
         id: init
