@@ -1,7 +1,6 @@
 {
     "name": "TerraForm",
     "description": "TerraForm MarsOffice Workflow",
-    "iconName": "tools-icon",
     "categories": [
         "TerraForm"
     ]
