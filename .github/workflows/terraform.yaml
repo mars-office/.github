@@ -44,11 +44,6 @@ jobs:
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-        working-directory: ${{ inputs.env }}
-
       - name: Terraform Init
         id: init
         run: terraform init
