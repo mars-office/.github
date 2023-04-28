@@ -36,6 +36,9 @@ jobs:
           file: ${{ inputs.env }}/secrets.tfvars
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
+      
+      - name: Test
+        run: cat ${{ inputs.env }}/secrets.tfvars
 
       - name: Terraform Init
         id: init
