@@ -37,12 +37,6 @@ jobs:
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
 
-      - name: Upload sec
-        uses: actions/upload-artifact@v3
-        with:
-          name: sec
-          path: ${{ inputs.env }}/secrets.tfvars
-
       - name: Terraform Init
         id: init
         run: terraform init
