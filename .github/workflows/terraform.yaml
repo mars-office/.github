@@ -30,6 +30,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Configure Terraform plugin cache
+        run: |
+          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
+          mkdir -p ~/.terraform.d/plugin-cache
+
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
+          restore-keys: ${{ runner.os }}-terraform-
+
       - name: Substitute Secrets
         uses: Lambdaspire/action-substitute-secrets-in-file@main
         with:
@@ -136,6 +148,18 @@ jobs:
       
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Configure Terraform plugin cache
+        run: |
+          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
+          mkdir -p ~/.terraform.d/plugin-cache
+          
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
+          restore-keys: ${{ runner.os }}-terraform-
 
       - name: Download tfplan
         uses: actions/download-artifact@v3
