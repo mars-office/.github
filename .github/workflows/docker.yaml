@@ -28,6 +28,7 @@ jobs:
         with:
           push: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
           context: .
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest
