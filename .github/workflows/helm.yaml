@@ -29,6 +29,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Update Chart Dependencies
+        run: helm dependency update
+        id: update
+        working-directory: ${{ inputs.workingDirectory }}
+
       - name: Lint Chart
         run: helm lint ${{ inputs.workingDirectory }}
         id: lint
