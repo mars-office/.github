@@ -26,6 +26,9 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Lint Chart
         run: helm lint ${{ inputs.workingDirectory }}
         id: lint
