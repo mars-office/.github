@@ -12,6 +12,9 @@ on:
         type: string
         default: '.'
 
+env:
+  HELM_EXPERIMENTAL_OCI: 1
+
 jobs:
   helm_build:
     runs-on: ubuntu-latest
@@ -22,3 +25,21 @@ jobs:
           version: '${{ inputs.helmVersion }}'
           token: ${{ secrets.GH_TOKEN }}
         id: install
+
+      - name: Lint Chart
+        run: helm lint ${{ inputs.workingDirectory }}
+        id: lint
+
+      - name: Dry Template Chart
+        run: helm template ${{ inputs.workingDirectory }}
+        id: template
+
+      - name: Package Chart
+        run: helm package ${{ inputs.workingDirectory }}
+        id: package
+
+      - name: Upload tar.gz Chart
+        uses: actions/upload-artifact@v3
+        with:
+          name: chart
+          path: ${{ inputs.workingDirectory }}/*.tar.gz
