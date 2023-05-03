@@ -35,16 +35,19 @@ jobs:
         working-directory: ${{ inputs.workingDirectory }}
 
       - name: Lint Chart
-        run: helm lint ${{ inputs.workingDirectory }}
+        run: helm lint .
+        working-directory: ${{ inputs.workingDirectory }}
         id: lint
 
       - name: Dry Template Chart
-        run: helm template ${{ inputs.workingDirectory }}
+        run: helm template .
+        working-directory: ${{ inputs.workingDirectory }}
         id: template
 
       - name: Package Chart
-        run: helm package ${{ inputs.workingDirectory }}
+        run: helm package .
         id: package
+        working-directory: ${{ inputs.workingDirectory }}
 
       - name: Upload tar.gz Chart
         id: upload
@@ -52,7 +55,7 @@ jobs:
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
         with:
           name: chart
-          path: ./*.tar.gz
+          path: ${{ inputs.workingDirectory }}/*.tar.gz
 
   helm_push:
     runs-on: ubuntu-latest
