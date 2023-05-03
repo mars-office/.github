@@ -49,13 +49,13 @@ jobs:
         id: package
         working-directory: ${{ inputs.workingDirectory }}
 
-      - name: Upload tar.gz Chart
+      - name: Upload tgz Chart
         id: upload
         uses: actions/upload-artifact@v3
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
         with:
           name: chart
-          path: ${{ inputs.workingDirectory }}/*.tar.gz
+          path: ${{ inputs.workingDirectory }}/*.tgz
 
   helm_push:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
      
-      - name: Download tar.gz Chart
+      - name: Download tgz Chart
         id: download
         uses: actions/download-artifact@v3
         with:
