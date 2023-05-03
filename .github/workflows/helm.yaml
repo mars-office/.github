@@ -75,3 +75,11 @@ jobs:
         with:
           name: chart
           path: '.'
+
+      - name: Read Chart Name
+        run: |
+          echo "CHART_NAME=$(ls *.tgz | sed 's/-[^-]*$//')" >> $GITHUB_ENV
+
+      - name: Registry Login
+        run: |
+          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io/${{ github.repository_owner }}/$CHART_NAME --username ${{ github.repository_owner }} --password-stdin
