@@ -2,12 +2,6 @@ name: Docker Build and Push
 
 on:
   workflow_call:
-    inputs:
-      dockerVersion:
-        required: false
-        type: string
-        default: '3.11.3'
-
 
 jobs:
   docker_build_push:
