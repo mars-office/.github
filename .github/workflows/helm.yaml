@@ -47,7 +47,27 @@ jobs:
         id: package
 
       - name: Upload tar.gz Chart
+        id: upload
         uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           name: chart
           path: ${{ inputs.workingDirectory }}/*.tar.gz
+
+  helm_push:
+    runs-on: ubuntu-latest
+    needs: [helm_build]
+    steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '${{ inputs.helmVersion }}'
+          token: ${{ secrets.GH_TOKEN }}
+        id: install
+     
+      - name: Download tar.gz Chart
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: chart
+          path: '.'
