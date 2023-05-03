@@ -59,4 +59,4 @@ jobs:
         id: push
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
         run: |
-          helm push *.tgz oci://ghcr.io/${{ github.repository_owner }}
+          helm push ${{ inputs.workingDirectory }}/*.tgz oci://ghcr.io/${{ github.repository_owner }}
