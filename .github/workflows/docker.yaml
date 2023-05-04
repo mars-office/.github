@@ -2,10 +2,7 @@ name: Docker Build and Push
 
 on:
   workflow_call:
-
-env:
-  appVersion: 'latest'
-
+    
 jobs:
   docker_build_push:
     runs-on: ubuntu-latest
@@ -26,10 +23,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Read Chart.yaml variables
-        run: |
-            echo "appVersion=$(yq '.appVersion' chart/Chart.yaml)" >> $GITHUB_ENV
-
       - name: Build and Push
         uses: docker/build-push-action@v4
         with:
@@ -38,4 +31,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:${{ env.appVersion }}
+          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest
