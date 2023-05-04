@@ -1,4 +1,4 @@
-name: Helm Build and Push
+name: Helm build and push
 
 on:
   workflow_call:
