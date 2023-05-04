@@ -2,7 +2,11 @@ name: Docker Build and Push
 
 on:
   workflow_call:
-    
+    inputs:
+      version:
+        required: true
+        type: string
+
 jobs:
   docker_build_push:
     runs-on: ubuntu-latest
@@ -31,4 +35,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest
+          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}

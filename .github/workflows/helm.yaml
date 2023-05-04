@@ -11,6 +11,9 @@ on:
         required: false
         type: string
         default: '.'
+      version:
+        required: true
+        type: string
 
 env:
   HELM_EXPERIMENTAL_OCI: 1
@@ -50,7 +53,7 @@ jobs:
         id: template
 
       - name: Package Chart
-        run: helm package .
+        run: helm package --version ${{ inputs.version }} --app-version v${{ inputs.version }} .
         id: package
         working-directory: ${{ inputs.workingDirectory }}
       
