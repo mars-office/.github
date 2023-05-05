@@ -1,0 +1,63 @@
+name: Helm deploy
+
+on:
+  workflow_call:
+    inputs:
+      helmVersion:
+        required: false
+        type: string
+        default: '3.11.3'
+      chartName:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+        default: 'dev'
+      namespace:
+        required: true
+        type: string
+      operation:
+        required: true
+        type: string
+        default: 'upgrade'
+
+env:
+  HELM_EXPERIMENTAL_OCI: 1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+    steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '${{ inputs.helmVersion }}'
+          token: ${{ secrets.GH_TOKEN }}
+        id: install
+
+      - name: Registry Login
+        id: login
+        run: |
+          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+      
+      - name: Substitute Secrets
+        uses: Lambdaspire/action-substitute-secrets-in-file@main
+        with:
+          file: values-${{ inputs.env }}.yaml
+          tokenPattern: ${TOKEN}
+          secretsJson: ${{ toJSON(secrets) }}
+
+      - name: Helm upgrade
+        if: inputs.operation == 'upgrade'
+        run: |
+            helm upgrade --install --create-namespace --atomic --namespace ${{ inputs.namespace }} --version ${{ inputs.version }} --values values-${{ inputs.env }}.yaml ${{ inputs.chartName }} oci://ghcr.io/mars-office/${{ inputs.chartName }}
+      
+      - name: Helm uninstall
+        if: inputs.operation == 'uninstall'
+        run: |
+            helm uninstall --namespace ${{ inputs.namespace }} ${{ inputs.chartName }}
