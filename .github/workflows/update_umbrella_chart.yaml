@@ -66,6 +66,7 @@ jobs:
         id: update
 
       - name: Push changes to umbrella chart repo
+        continue-on-error: true
         working-directory: umbrella
         run: |
             git config user.name "GitHub Actions Bot"
