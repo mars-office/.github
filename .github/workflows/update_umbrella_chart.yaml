@@ -7,6 +7,9 @@ on:
         required: false
         type: string
         default: '3.11.3'
+      chartName:
+        required: true
+        type: string
       version:
         required: true
         type: string
@@ -38,7 +41,7 @@ jobs:
       
       - name: Set chart name variable
         run: |
-            echo "CHART_NAME=${{ inputs.umbrellaChartName }}" >> $GITHUB_ENV
+            echo "CHART_NAME=${{ inputs.chartName }}" >> $GITHUB_ENV
 
       - name: Replace version for subchart
         run: |
