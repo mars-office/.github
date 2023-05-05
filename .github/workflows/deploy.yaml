@@ -60,7 +60,9 @@ jobs:
           ENV: ${{ inputs.env }}
         run: |
             mkdir -p ~/.kube
-            echo ${{ secrets[format('{0}_KUBECONFIG', env.ENV)] }} > ~/.kube/config
+            cat <<\EOT >./kube/config
+            ${{ secrets[format('{0}_KUBECONFIG', env.ENV)] }}
+            EOT
 
       - name: Helm upgrade
         if: inputs.operation == 'upgrade'
