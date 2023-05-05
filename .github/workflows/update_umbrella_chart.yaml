@@ -52,6 +52,7 @@ jobs:
             echo "CHART_NAME=$(yq '.name' Chart.yaml)" >> $GITHUB_ENV
 
       - name: Replace version for subchart
+        working-directory: umbrella
         run: |
             newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(CHART_NAME))).version = strenv(newver)' ./Chart.yaml
 
@@ -61,10 +62,12 @@ jobs:
           echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
 
       - name: Update Chart Dependencies
+        working-directory: umbrella
         run: helm dependency update
         id: update
 
       - name: Push changes to umbrella chart repo
+        working-directory: umbrella
         run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "actions@github.com"
