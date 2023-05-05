@@ -14,10 +14,6 @@ on:
       version:
         required: true
         type: string
-      umbrellaChartName:
-        required: false
-        type: string
-        default: ''
 
 env:
   HELM_EXPERIMENTAL_OCI: 1
@@ -74,46 +70,3 @@ jobs:
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
         run: |
           helm push ${{ inputs.workingDirectory }}/*.tgz oci://ghcr.io/${{ github.repository_owner }}
-
-  update_umbrella_chart:
-    runs-on: ubuntu-latest
-    needs: [helm_build_push]
-    if: ${{ inputs.umbrellaChartName != '' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')) }}
-    steps:
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: '${{ inputs.helmVersion }}'
-          token: ${{ secrets.GH_TOKEN }}
-        id: install
-
-      - name: Checkout umbrella
-        uses: actions/checkout@v3
-        with:
-          repository: 'mars-office/${{inputs.umbrellaChartName}}'
-          ref: 'main'
-          token: ${{ secrets.GH_TOKEN }}
-      
-      - name: Set chart name variable
-        run: |
-            echo "CHART_NAME=${{ needs.helm_build_push.outputs.chartName }}" >> $GITHUB_ENV
-
-      - name: Replace version for subchart
-        run: |
-            newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(CHART_NAME))).version = strenv(newver)' ./Chart.yaml
-
-      - name: Registry Login
-        id: login
-        run: |
-          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
-
-      - name: Update Chart Dependencies
-        run: helm dependency update
-        id: update
-
-      - name: Push changes to umbrella chart repo
-        run: |
-            git config user.name "GitHub Actions Bot"
-            git config user.email "actions@github.com"
-            git commit -m "Bumped version for subchart: $CHART_NAME to ${{ inputs.version }}" .
-            git push origin main
