@@ -7,9 +7,10 @@ on:
         required: false
         type: string
         default: '3.11.3'
-      chartName:
-        required: true
+      workingDirectory:
+        required: false
         type: string
+        default: '.'
       version:
         required: true
         type: string
@@ -38,10 +39,17 @@ jobs:
           repository: 'mars-office/${{inputs.umbrellaChartName}}'
           ref: 'main'
           token: ${{ secrets.GH_TOKEN }}
+          path: 'umbrella'
+
+      - name: Checkout self
+        uses: actions/checkout@v3
+        with:
+          path: 'subchart'
       
       - name: Set chart name variable
+        working-directory: subchart/${{ inputs.workingDirectory }}
         run: |
-            echo "CHART_NAME=${{ inputs.chartName }}" >> $GITHUB_ENV
+            echo "CHART_NAME=$(yq '.name' Chart.yaml)" >> $GITHUB_ENV
 
       - name: Replace version for subchart
         run: |
