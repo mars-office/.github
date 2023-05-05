@@ -79,16 +79,28 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
 
-      - name: Checkout
+      - name: Checkout umbrella
         uses: actions/checkout@v3
         with:
           repository: 'mars-office/${{inputs.umbrellaChartName}}'
           ref: 'main'
+          path: 'umbrella'
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Replace version for subchart
+      - name: Checkout self
+        uses: actions/checkout@v3
+        with:
+          path: 'subchart'
+      
+      - name: Get chart name
+        working-directory: subchart
         run: |
-            chart="${{ github.repository.name }}" newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(chart))).version = strenv(newver)' ./Chart.yaml
+            echo "CHART_NAME=$(yq '.name' ${{inputs.workingDirectory}}/Chart.yaml)" >> $GITHUB_ENV
+
+      - name: Replace version for subchart
+        working-directory: umbrella
+        run: |
+            newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(CHART_NAME))).version = strenv(newver)' ./Chart.yaml
 
       - name: Registry Login
         id: login
@@ -97,11 +109,13 @@ jobs:
 
       - name: Update Chart Dependencies
         run: helm dependency update
+        working-directory: umbrella
         id: update
 
       - name: Push changes to umbrella chart repo
+        working-directory: umbrella
         run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "actions@github.com"
-            git commit -m "Bumped version for subchart: ${{ github.repository.name }}" .
+            git commit -m "Bumped version for subchart: $CHART_NAME to ${{ inputs.version }}" .
             git push origin main
