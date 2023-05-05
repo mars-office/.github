@@ -24,6 +24,8 @@ env:
 
 jobs:
   helm_build_push:
+    outputs:
+      chartName: ${{ steps.getChartName.outputs.name }}
     runs-on: ubuntu-latest
     steps:
       - name: Install Helm
@@ -35,6 +37,12 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Get chart name
+        id: getChartName
+        working-directory: ${{inputs.workingDirectory}}
+        run: |
+            echo "name=$(yq '.name' Chart.yaml)" >> "$GITHUB_OUTPUT"
 
       - name: Registry Login
         id: login
@@ -84,21 +92,13 @@ jobs:
         with:
           repository: 'mars-office/${{inputs.umbrellaChartName}}'
           ref: 'main'
-          path: 'umbrella'
           token: ${{ secrets.GH_TOKEN }}
-
-      - name: Checkout self
-        uses: actions/checkout@v3
-        with:
-          path: 'subchart'
       
-      - name: Get chart name
-        working-directory: subchart
+      - name: Set chart name variable
         run: |
-            echo "CHART_NAME=$(yq '.name' ${{inputs.workingDirectory}}/Chart.yaml)" >> $GITHUB_ENV
+            echo "CHART_NAME=${{ needs.helm_build_push.outputs.chartName }}" >> $GITHUB_ENV
 
       - name: Replace version for subchart
-        working-directory: umbrella
         run: |
             newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(CHART_NAME))).version = strenv(newver)' ./Chart.yaml
 
@@ -109,11 +109,9 @@ jobs:
 
       - name: Update Chart Dependencies
         run: helm dependency update
-        working-directory: umbrella
         id: update
 
       - name: Push changes to umbrella chart repo
-        working-directory: umbrella
         run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "actions@github.com"
