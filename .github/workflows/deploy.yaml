@@ -40,6 +40,9 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Registry Login
         id: login
         run: |
