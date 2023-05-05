@@ -55,6 +55,13 @@ jobs:
           tokenPattern: ${TOKEN}
           secretsJson: ${{ toJSON(secrets) }}
 
+      - name: Create kubeconfig
+        env:
+          ENV: ${{ inputs.env }}
+        run: |
+            mkdir -p ~/.kube
+            echo ${{ secrets[format('{0}_KUBECONFIG', env.ENV)] }} > ~/.kube/config
+
       - name: Helm upgrade
         if: inputs.operation == 'upgrade'
         run: |
