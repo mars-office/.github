@@ -84,6 +84,7 @@ jobs:
         with:
           repository: 'mars-office/${{inputs.umbrellaChartName}}'
           ref: 'main'
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Replace version for subchart
         run: |
