@@ -60,7 +60,8 @@ jobs:
           ENV: ${{ inputs.env }}
         run: |
             mkdir -p ~/.kube
-            cat <<\EOT >./kube/config
+            touch ~/.kube/config
+            cat <<\EOT > ~/.kube/config
             ${{ secrets[format('{0}_KUBECONFIG', env.ENV)] }}
             EOT
 
