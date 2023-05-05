@@ -14,6 +14,10 @@ on:
       version:
         required: true
         type: string
+      umbrellaChartName:
+        required: false
+        type: string
+        default: ''
 
 env:
   HELM_EXPERIMENTAL_OCI: 1
@@ -62,3 +66,41 @@ jobs:
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
         run: |
           helm push ${{ inputs.workingDirectory }}/*.tgz oci://ghcr.io/${{ github.repository_owner }}
+
+  update_umbrella_chart:
+    runs-on: ubuntu-latest
+    needs: [helm_build_push]
+    if: ${{ inputs.umbrellaChartName != '' }}
+    steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '${{ inputs.helmVersion }}'
+          token: ${{ secrets.GH_TOKEN }}
+        id: install
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: 'mars-office/${{inputs.umbrellaChartName}}'
+          ref: 'main'
+
+      - name: Replace version for subchart
+        run: |
+            echo "asdasdasd"
+
+      - name: Registry Login
+        id: login
+        run: |
+          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+
+      - name: Update Chart Dependencies
+        run: helm dependency update
+        id: update
+
+      - name: Push changes to umbrella chart repo
+        run: |
+            git config user.name "GitHub Actions Bot"
+            git config user.email "actions@github.com"
+            git commit -m "Bumped version for subchart: ${{ github.repository.name }}" .
+            git push origin main
