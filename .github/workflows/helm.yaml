@@ -87,7 +87,7 @@ jobs:
 
       - name: Replace version for subchart
         run: |
-            echo "asdasdasd"
+            chart="${{ github.repository.name }}" newver="${{ inputs.version }}" yq -i '(.dependencies[] | select (.name == strenv(chart))).version = strenv(newver)' ./Chart.yaml
 
       - name: Registry Login
         id: login
