@@ -36,3 +36,5 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
+          build-args: |
+            DEPLOYABLE_VERSION=v${{ inputs.version }}
