@@ -25,16 +25,19 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: test
+      - name: Build envfile
         env:
           TEMPVARS: ${{ toJson(vars) }}
           TEMPENV: ${{ toJson(env) }}
           TEMPSECRETS: ${{ toJson(secrets) }}
         run: |
-            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPVARS)"
-            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPENV)"
-            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPSECRETS)"
+            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPVARS)" > ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPENV)" >> ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPSECRETS)" >> ./envfile
 
-      # - name: Docker run
-      #   run: |
-      #       docker run --env-file=$GITHUB_ENV --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
+      - name: Docker run
+        run: |
+            docker run --env-file=./envfile --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
+
+      - name: Cleanup
+        run: rm -rf ./envfile
