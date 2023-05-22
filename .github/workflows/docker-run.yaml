@@ -1,0 +1,28 @@
+name: Docker run
+
+on:
+  workflow_call:
+    inputs:
+      imageName:
+        required: true
+        type: string
+      version:
+        type: string
+      env:
+        required: true
+        type: string
+        default: 'dev'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+    steps:
+      - name: Registry Login
+        id: login
+        run: |
+          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+
+      - name: Docker run
+        run: |
+            docker run --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
