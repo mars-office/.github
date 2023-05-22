@@ -27,10 +27,13 @@ jobs:
 
       - name: test
         env:
-          TEMPVARS: ${{ toJson(env) }}
+          TEMPVARS: ${{ toJson(vars) }}
+          TEMPENV: ${{ toJson(env) }}
+          TEMPSECRETS: ${{ toJson(secrets) }}
         run: |
-            echo $HUNA_URL
             echo "$TEMPVARS"
+            echo "$TEMPENV"
+            echo "$TEMPSECRETS"
 
       # - name: Docker run
       #   run: |
