@@ -26,9 +26,11 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: test
+        env:
+          TEMPVARS: ${{ toJson(env) }}
         run: |
-            echo $GITHUB_ENV
-            cat $GITHUB_ENV
+            echo $HUNA_URL
+            echo "$TEMPVARS"
 
       # - name: Docker run
       #   run: |
