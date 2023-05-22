@@ -18,11 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     steps:
-      - name: Registry Login
-        id: login
-        run: |
-          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Docker run
         run: |
-            docker run --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
+            docker run --env-file=$GITHUB_ENV --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
