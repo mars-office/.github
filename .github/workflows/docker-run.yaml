@@ -14,7 +14,7 @@ on:
         default: 'dev'
 
 jobs:
-  deploy:
+  docker_run:
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     steps:
