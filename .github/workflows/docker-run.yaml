@@ -31,8 +31,9 @@ jobs:
           TEMPENV: ${{ toJson(env) }}
           TEMPSECRETS: ${{ toJson(secrets) }}
         run: |
-            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPVARS)" > ./envfile
-            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPENV)" >> ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPVARS)" > ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPENV)" >> ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPSECRETS)" >> ./envfile
 
       - name: Docker run
         run: |
