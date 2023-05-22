@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -29,15 +32,23 @@ jobs:
         env:
           TEMPVARS: ${{ toJson(vars) }}
           TEMPENV: ${{ toJson(env) }}
-          TEMPSECRETS: ${{ toJson(secrets) }}
         run: |
-            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPVARS)" > ./envfile
-            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPENV)" >> ./envfile
-            echo "$(jq -r 'to_entries[] | [.key,.value | @sh ] | join("=")' <<< $TEMPSECRETS)" >> ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPVARS)" > ./envfile
+            echo "$(jq -r 'to_entries[] | [.key,.value] | join("=")' <<< $TEMPENV)" >> ./envfile
+      
+      - name: Ensure secrets.env
+        run: touch secrets.env
+
+      - name: Substitute Secrets
+        uses: Lambdaspire/action-substitute-secrets-in-file@main
+        with:
+          file: secrets.env
+          tokenPattern: ${TOKEN}
+          secretsJson: ${{ toJSON(secrets) }}
 
       - name: Docker run
         run: |
-            docker run --rm --env-file=./envfile --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
+            docker run --rm --env-file=./envfile --env-file=./secrets.env --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
 
       - name: Cleanup
         run: rm -rf ./envfile
