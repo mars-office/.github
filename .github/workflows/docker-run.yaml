@@ -48,7 +48,7 @@ jobs:
 
       - name: Docker run
         run: |
-            docker run --rm --env-file=./envfile --env-file=./secrets.env --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:v${{ inputs.version }}
+            docker run --rm --env-file=./envfile --env-file=./secrets.env --name tempctr ghcr.io/mars-office/${{ inputs.imageName }}:${{ inputs.version }}
 
       - name: Cleanup
         run: rm -rf ./envfile
