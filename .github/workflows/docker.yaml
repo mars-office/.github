@@ -47,3 +47,4 @@ jobs:
           tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
           build-args: |
             DEPLOYABLE_VERSION=${{ inputs.version }}
+            GH_TOKEN=${{secrets.GH_TOKEN}}
