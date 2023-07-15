@@ -23,6 +23,7 @@ env:
 
 jobs:
   update_umbrella_chart:
+    concurrency: ${{ inputs.umbrellaChartName }}
     runs-on: ubuntu-latest
     steps:
       - name: Install Helm

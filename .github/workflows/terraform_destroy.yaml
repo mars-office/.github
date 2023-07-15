@@ -76,6 +76,7 @@ jobs:
 
   terraform_apply_destroy:
     runs-on: ubuntu-latest
+    concurrency: ${{ inputs.env }}
     needs: [terraform_plan_destroy]
     environment: approval
     steps:

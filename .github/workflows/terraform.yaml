@@ -135,6 +135,7 @@ jobs:
           
 
   terraform_apply:
+    concurrency: ${{ inputs.env }}
     runs-on: ubuntu-latest
     needs: [terraform_plan]
     if: github.event_name != 'pull_request'
