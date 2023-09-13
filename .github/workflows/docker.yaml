@@ -29,10 +29,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Set up Snyk
-        uses: snyk/actions/setup@master
-        if: ${{ inputs.securityScanDisabled == false }}
-
       - name: Checkout
         uses: actions/checkout@v3
 
