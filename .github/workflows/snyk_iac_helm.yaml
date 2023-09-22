@@ -13,7 +13,7 @@ on:
         default: 'chart'
         
 jobs:
-  snyk_iac:
+  snyk_iac_helm:
     permissions:
       contents: read
       security-events: write
