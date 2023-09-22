@@ -44,7 +44,7 @@ jobs:
           platforms: ${{ inputs.platforms }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
+          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
           build-args: |
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
