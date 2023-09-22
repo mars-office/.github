@@ -31,7 +31,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Helm template
-        run: helm template ./${{ inputs.chartPath }} --output-dir > ./helm_output.yaml
+        run: helm template ./${{ inputs.chartPath }} > ./helm_output.yaml
 
       - name: Snyk scan Helm IaC
         uses: snyk/actions/iac@master
