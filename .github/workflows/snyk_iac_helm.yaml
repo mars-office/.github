@@ -30,8 +30,14 @@ jobs:
           version: '${{ inputs.helmVersion }}'
           token: ${{ secrets.GH_TOKEN }}
 
+      - name: Registry Login
+        id: login
+        run: |
+          echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+
       - name: Helm template
-        run: helm dependency build && helm template ./${{ inputs.chartPath }} > ./helm_output.yaml
+        run: helm dependency update && helm template . > helm_output.yaml
+        working-directory: ${{ inputs.chartPath }}
 
       - name: Snyk scan Helm IaC
         uses: snyk/actions/iac@master
@@ -40,7 +46,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high --sarif-file-output=snyk.sarif
-          file: helm_output.yaml
+          file: ${{ inputs.chartPath }}/helm_output.yaml
 
       - name: Upload Snyk report as sarif 📦
         uses: github/codeql-action/upload-sarif@v2
