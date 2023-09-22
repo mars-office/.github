@@ -28,13 +28,13 @@ jobs:
 
       - name: Snyk Code test
         if: ${{ inputs.scanType == 'docker' }}
-        run: snyk code test -d --sarif > snyk-code.sarif
+        run: snyk code test -d --org=${{ secrets.SNYK_ORG_ID }}  --sarif > snyk-code.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Snyk IaC test and report
         if: ${{ inputs.scanType == 'iac' }}
-        run: snyk iac test --report
+        run: snyk iac test --report --org=${{ secrets.SNYK_ORG_ID }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
