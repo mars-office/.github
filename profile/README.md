@@ -10,4 +10,3 @@ Telepresence (Ambassador Cloud): https://app.getambassador.io/cloud/home/dashboa
 GCP Project: https://console.cloud.google.com/welcome?project=huna-2  
 Facebook App: https://developers.facebook.com/apps/1314030069470499/fb-login/settings/?business_id=659328175217684  
 Microsoft Azure App Registration: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/83bd1d3b-a1af-4eca-af1b-b9dae6637506/isMSAApp~/false  
-Snyk: https://app.snyk.io/org/mars-office-2Pdu2BrtutoaQeNWqQQNCB  
