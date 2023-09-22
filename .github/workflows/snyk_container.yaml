@@ -1,14 +1,14 @@
-name: Snyk
+name: Snyk Container
 
 on:
   workflow_call:
     inputs:
       version:
-        required: true
+        required: false
         type: string
 
 jobs:
-  snyk:
+  snyk_container:
     permissions:
       contents: read
       security-events: write
