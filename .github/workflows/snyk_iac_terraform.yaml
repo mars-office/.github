@@ -20,6 +20,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Download tfplan
+        uses: actions/download-artifact@v3
+        with:
+          name: tfplan
+          path: ${{inputs.folder}}/tfplan
+
       - name: Snyk scan Helm IaC
         uses: snyk/actions/iac@master
         continue-on-error: true
