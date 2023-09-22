@@ -49,6 +49,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.scanType == 'docker' }}
         uses: github/codeql-action/upload-sarif@v2
         continue-on-error: true
         with:
