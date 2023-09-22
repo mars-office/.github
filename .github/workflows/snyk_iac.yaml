@@ -5,6 +5,11 @@ on:
         
 jobs:
   snyk_iac:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      packages: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
