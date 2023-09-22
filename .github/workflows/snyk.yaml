@@ -40,7 +40,7 @@ jobs:
 
       - name: Snyk Container monitor
         if: ${{ inputs.scanType == 'docker' }}
-        run: snyk container monitor mars-office/${{ github.event.repository.name }} --file=Dockerfile
+        run: snyk container monitor mars-office/${{ github.event.repository.name }} --file=Dockerfile --org=${{ secrets.SNYK_ORG_ID }}
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.scanType == 'docker' }}
