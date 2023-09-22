@@ -14,10 +14,6 @@ on:
         required: false
         type: boolean
         default: false
-      securityScanDisabled:
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   docker_build_push:
@@ -52,19 +48,3 @@ jobs:
           build-args: |
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
-
-      - name: Snyk security scan
-        if: ${{ inputs.securityScanDisabled == false }}
-        continue-on-error: true
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
-          args: --file=Dockerfile
-      
-      - name: Upload Snyk security scan result to GitHub Code Scanning
-        if: ${{ inputs.securityScanDisabled == false }}
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
