@@ -26,16 +26,17 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Snyk auth
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
       - name: Snyk Code test
         if: ${{ inputs.scanType == 'docker' }}
-        run: snyk code test --sarif > snyk-code.sarif || true
+        run: snyk code test --sarif > snyk-code.sarif
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Snyk IaC test and report
         if: ${{ inputs.scanType == 'iac' }}
-        run: snyk iac test --report || true
+        run: snyk iac test --report
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Build a Docker image
         if: ${{ inputs.scanType == 'docker' }}
@@ -44,6 +45,8 @@ jobs:
       - name: Snyk Container monitor
         if: ${{ inputs.scanType == 'docker' }}
         run: snyk container monitor mars-office/${{ github.event.repository.name }} --file=Dockerfile --org=${{ secrets.SNYK_ORG_ID }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
