@@ -1,0 +1,48 @@
+name: Snyk IaC Helm
+
+on:
+  workflow_call:
+    inputs:
+      helmVersion:
+        required: false
+        type: string
+        default: '3.11.3'
+      chartPath:
+        required: false
+        type: string
+        default: 'chart'
+        
+jobs:
+  snyk_iac:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      packages: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '${{ inputs.helmVersion }}'
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Helm template
+        run: helm template ./${{ inputs.chartPath }} --output-dir > ./helm_output.yaml
+
+      - name: Snyk scan Helm IaC
+        uses: snyk/actions/iac@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif
+          file: helm_output.yaml
+
+      - name: Upload Snyk report as sarif 📦
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif

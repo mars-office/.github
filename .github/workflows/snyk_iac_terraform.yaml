@@ -1,4 +1,4 @@
-name: Snyk IaC
+name: Snyk IaC TerraForm
 
 on:
   workflow_call:
@@ -15,14 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Snyk scan IaC
+      - name: Snyk scan Helm IaC
         uses: snyk/actions/iac@master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --sarif-file-output=snyk.sarif -d
-          file: chart/templates/
+          args: --severity-threshold=high --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk report as sarif 📦
         uses: github/codeql-action/upload-sarif@v2
