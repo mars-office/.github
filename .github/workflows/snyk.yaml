@@ -1,0 +1,49 @@
+name: "Snyk"
+
+on:
+  workflow_call:
+    inputs:
+      scanType:
+        type: string
+        required: true
+        default: 'docker'
+
+permissions:
+  contents: read
+
+jobs:
+  snyk:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Snyk CLI to check for security issues
+        uses: snyk/actions/setup@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk Code test
+        if: ${{ inputs.scanType == 'docker' }}
+        run: snyk code test --sarif > snyk-code.sarif || true
+
+      - name: Snyk IaC test and report
+        if: ${{ inputs.scanType == 'iac' }}
+        run: snyk iac test --report || true
+
+      - name: Build a Docker image
+        if: ${{ inputs.scanType == 'docker' }}
+        run: docker build -t mars-office/${{ github.event.repository.name }} .
+
+      - name: Snyk Container monitor
+        if: ${{ inputs.scanType == 'docker' }}
+        run: snyk container monitor mars-office/${{ github.event.repository.name }} --file=Dockerfile
+
+      - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.scanType == 'docker' }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk-code.sarif
