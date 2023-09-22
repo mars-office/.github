@@ -32,7 +32,7 @@ jobs:
         with:
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
           args: --file=Dockerfile --severity-threshold=high --sarif-file-output=snyk.sarif -d
-          command: 'container test'
+          command: 'monitor'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
