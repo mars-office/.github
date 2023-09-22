@@ -31,8 +31,8 @@ jobs:
         continue-on-error: true
         with:
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:${{ inputs.version }}
-          args: --file=Dockerfile --severity-threshold=high --sarif-file-output=snyk.sarif -d
-          command: 'monitor'
+          args: --file=Dockerfile --severity-threshold=high --sarif-file-output=snyk.sarif -d --username=marsoffice --password=${{secrets.GH_TOKEN}}
+          command: 'test'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
