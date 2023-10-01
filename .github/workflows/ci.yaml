@@ -138,14 +138,15 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
-          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=medium --username=mars-office --password=${{ secrets.GH_TOKEN }}
+          sarif: true
+          args: --file=Dockerfile --severity-threshold=medium --username=mars-office --password=${{ secrets.GH_TOKEN }}
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.dockerScanDisabled == false }}
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk_docker.sarif
+          sarif_file: snyk.sarif
 
       - name: Fail job if scan failed
         if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
