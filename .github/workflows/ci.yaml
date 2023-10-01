@@ -59,6 +59,11 @@ env:
 
 jobs:
   code_scan:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: write
     if: ${{ inputs.codeScanDisabled == false }}
     runs-on: ubuntu-latest
     steps:
@@ -85,6 +90,11 @@ jobs:
         run: exit 1
 
   docker_build_push:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: write
     if: ${{ inputs.dockerBuildAndPushDisabled == false }}
     runs-on: ubuntu-latest
     steps:
@@ -139,6 +149,11 @@ jobs:
         run: exit 1
       
   helm_build_push:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: write
     outputs:
       chartName: ${{ steps.getChartName.outputs.name }}
     runs-on: ubuntu-latest
@@ -213,6 +228,11 @@ jobs:
           helm push ${{ inputs.helmChartPath }}/*.tgz oci://ghcr.io/${{ github.repository_owner }}
 
   update_umbrella_chart:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+      packages: write
     concurrency: ${{ inputs.umbrellaChartName }}
     if: ${{ inputs.updateUmbrellaChartDisabled == false && inputs.helmBuildAndPushDisabled == false && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')) }}
     needs: [helm_build_push, docker_build_push, code_scan]
