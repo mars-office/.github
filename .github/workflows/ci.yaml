@@ -134,6 +134,7 @@ jobs:
         id: docker_scan
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
           args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
