@@ -64,6 +64,7 @@ jobs:
       actions: read
       contents: read
       packages: write
+      id-token: write
     if: ${{ inputs.codeScanDisabled == false }}
     runs-on: ubuntu-latest
     steps:
@@ -91,6 +92,7 @@ jobs:
 
   docker_build_push:
     permissions:
+      id-token: write
       security-events: write
       actions: read
       contents: read
@@ -151,6 +153,7 @@ jobs:
       
   helm_build_push:
     permissions:
+      id-token: write
       security-events: write
       actions: read
       contents: read
@@ -230,6 +233,7 @@ jobs:
 
   update_umbrella_chart:
     permissions:
+      id-token: write
       security-events: write
       actions: read
       contents: read
