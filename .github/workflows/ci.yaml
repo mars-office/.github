@@ -79,7 +79,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           uses: snyk/actions/${{ inputs.codeScanLanguage }}@master
-          with: '{ "args": "--sarif-file-output=snyk_code.sarif --severity-threshold=high" }'
+          with: '{ "args": "--sarif-file-output=snyk_code.sarif --severity-threshold=medium" }'
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
@@ -138,7 +138,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
-          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=high -d
+          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=medium -d
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
@@ -209,7 +209,7 @@ jobs:
         with:
           file: ${{ inputs.helmChartPath }}/output.yaml
           sarif: true
-          args: --severity-threshold=high
+          args: --severity-threshold=medium
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.helmScanDisabled == false }}
