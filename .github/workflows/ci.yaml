@@ -37,11 +37,52 @@ on:
       umbrellaChartName:
         required: false
         type: string
+      codeScanDisabled:
+        type: boolean
+        required: false
+        default: false
+      codeScanLanguage:
+        type: string
+        required: false
+        default: 'node'
+      dockerScanDisabled:
+        type: boolean
+        required: false
+        default: false
+      helmScanDisabled:
+        type: boolean
+        required: false
+        default: false
 
 env:
   HELM_EXPERIMENTAL_OCI: 1
 
 jobs:
+  code_scan:
+    if: ${{ inputs.codeScanDisabled == false }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: ${{ format('snyk/actions/{0}@master', inputs.codeScanLanguage) }}
+        continue-on-error: true
+        id: code_scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk_code.sarif
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk_code.sarif
+
+      - name: Fail job if scan failed
+        if: ${{ steps.code_scan.outcome == 'failure' }}
+        run: exit 1
+
   docker_build_push:
     if: ${{ inputs.dockerBuildAndPushDisabled == false }}
     runs-on: ubuntu-latest
@@ -75,6 +116,27 @@ jobs:
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
 
+      - name: Run Snyk to check for vulnerabilities
+        if: ${{ inputs.dockerScanDisabled == false }}
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        id: docker_scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif
+          image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
+
+      - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.dockerScanDisabled == false }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk_docker.sarif
+
+      - name: Fail job if scan failed
+        if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
+        run: exit 1
+      
   helm_build_push:
     outputs:
       chartName: ${{ steps.getChartName.outputs.name }}
@@ -112,10 +174,31 @@ jobs:
         working-directory: ${{ inputs.helmChartPath }}
         id: lint
 
-      - name: Dry Template Chart
-        run: helm template .
+      - name: Template Chart
+        run: helm template . > ./output.yaml
         working-directory: ${{ inputs.helmChartPath }}
         id: template
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/iac@master
+        continue-on-error: true
+        if: ${{ inputs.helmScanDisabled == false }}
+        id: helm_scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk_helm.sarif
+          file: ${{ inputs.helmChartPath }}/output.yaml
+
+      - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.helmScanDisabled == false }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk_helm.sarif
+
+      - name: Fail job if scan failed
+        if: ${{ inputs.helmScanDisabled == false && steps.helm_scan.outcome == 'failure' }}
+        run: exit 1
 
       - name: Package Chart
         run: helm package --version ${{ inputs.version }} --app-version v${{ inputs.version }} .
@@ -131,7 +214,7 @@ jobs:
   update_umbrella_chart:
     concurrency: ${{ inputs.umbrellaChartName }}
     if: ${{ inputs.updateUmbrellaChartDisabled == false && inputs.helmBuildAndPushDisabled == false && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')) }}
-    needs: [helm_build_push, docker_build_push]
+    needs: [helm_build_push, docker_build_push, code_scan]
     runs-on: ubuntu-latest
     steps:
       - name: Install Helm
