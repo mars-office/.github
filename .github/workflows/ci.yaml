@@ -138,7 +138,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
-          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=high
+          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=high -d
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
