@@ -129,14 +129,6 @@ jobs:
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
 
-      - name: Login to GitHub Container Registry 2
-        uses: docker/login-action@v2
-        if: ${{ inputs.dockerScanDisabled == false }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_TOKEN }}
-
       - name: Run Snyk to check for vulnerabilities
         if: ${{ inputs.dockerScanDisabled == false }}
         uses: snyk/actions/docker@master
@@ -146,7 +138,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
-          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=medium -d
+          args: --file=Dockerfile --sarif-file-output=snyk_docker.sarif --severity-threshold=medium --username=mars-office --password=${{ secrets.GH_TOKEN }}
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
