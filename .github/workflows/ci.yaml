@@ -79,6 +79,7 @@ jobs:
     outputs:
       chartName: ${{ steps.getChartName.outputs.name }}
     runs-on: ubuntu-latest
+    if: ${{ inputs.helmBuildAndPushDisabled == false }}
     steps:
       - name: Install Helm
         uses: azure/setup-helm@v3
