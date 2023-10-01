@@ -206,6 +206,7 @@ jobs:
         with:
           args: --sarif-file-output=snyk_helm.sarif
           file: ${{ inputs.helmChartPath }}/output.yaml
+          sarif: true
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.helmScanDisabled == false }}
