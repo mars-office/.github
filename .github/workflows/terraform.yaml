@@ -30,7 +30,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: ${{ inputs.env }}/main.tf
+          file: ${{ inputs.env }}
           sarif: true
           args: --severity-threshold=high
 
