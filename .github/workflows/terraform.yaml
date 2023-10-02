@@ -10,11 +10,40 @@ on:
         required: false
         type: string
         default: '1.4.6'
+      tfScanDisabled:
+        required: false
+        type: boolean
+        default: false
 
 env:
   TF_IN_AUTOMATION: 'true'
 
 jobs:
+  terraform_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/iac@master
+        continue-on-error: true
+        if: ${{ inputs.tfScanDisabled == false }}
+        id: tf_code_scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          file: ${{ inputs.env }}/main.tf
+          sarif: true
+          args: --severity-threshold=high
+
+      - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.tfScanDisabled == false }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
+
+      - name: Fail job if scan failed
+        if: ${{ inputs.tfScanDisabled == false && steps.tf_code_scan.outcome == 'failure' }}
+        run: exit 1
+
   terraform_plan:
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
@@ -126,6 +155,32 @@ jobs:
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
+
+      - name: Convert plan to JSON
+        if: ${{ inputs.tfScanDisabled == false }}
+        run: terraform show -json ${{ inputs.env }}/tfplan > ${{ inputs.env }}/tfplan.json
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/iac@master
+        continue-on-error: true
+        if: ${{ inputs.tfScanDisabled == false }}
+        id: tf_scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          file: ${{ inputs.env }}/tfplan.json
+          sarif: true
+          args: --severity-threshold=high --scan=resource-changes
+
+      - name: Upload result to GitHub Code Scanning
+        if: ${{ inputs.tfScanDisabled == false }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
+
+      - name: Fail job if scan failed
+        if: ${{ inputs.tfScanDisabled == false && steps.tf_scan.outcome == 'failure' }}
+        run: exit 1
       
       - name: Upload tfplan
         uses: actions/upload-artifact@v3
@@ -136,7 +191,7 @@ jobs:
 
   terraform_apply:
     runs-on: ubuntu-latest
-    needs: [terraform_plan]
+    needs: [terraform_plan, terraform_scan]
     if: github.event_name != 'pull_request'
     environment: approval
     steps:
