@@ -19,40 +19,6 @@ env:
   TF_IN_AUTOMATION: 'true'
 
 jobs:
-  terraform_scan:
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-      packages: write
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/iac@master
-        continue-on-error: true
-        if: ${{ inputs.tfScanDisabled == false }}
-        id: tf_code_scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          file: ${{ inputs.env }}
-          sarif: true
-          args: --severity-threshold=high
-
-      - name: Upload result to GitHub Code Scanning
-        if: ${{ inputs.tfScanDisabled == false }}
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
-
-      - name: Fail job if scan failed
-        if: ${{ inputs.tfScanDisabled == false && steps.tf_code_scan.outcome == 'failure' }}
-        run: exit 1
-
   terraform_plan:
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
@@ -183,7 +149,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: ./${{ inputs.env }}/tf-plan.json
+          file: ${{ inputs.env }}
           sarif: true
           args: --severity-threshold=high --scan=planned-values -d
 
@@ -212,7 +178,7 @@ jobs:
       packages: write
       id-token: write
     runs-on: ubuntu-latest
-    needs: [terraform_plan, terraform_scan]
+    needs: [terraform_plan]
     if: github.event_name != 'pull_request'
     environment: approval
     steps:
