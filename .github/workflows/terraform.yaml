@@ -151,7 +151,7 @@ jobs:
         with:
           file: ${{ inputs.env }}
           sarif: true
-          args: --severity-threshold=high --scan=resource-changes -d
+          args: --severity-threshold=high --scan=resource-changes
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.tfScanDisabled == false }}
