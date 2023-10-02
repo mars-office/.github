@@ -175,6 +175,11 @@ jobs:
         working-directory: ${{ inputs.env }}
         run: terraform show -json tfplan > tfplan.json
 
+      - name: Test plan to JSON
+        if: ${{ inputs.tfScanDisabled == false }}
+        working-directory: ${{ inputs.env }}
+        run: cat tfplan.json
+
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/iac@master
         continue-on-error: true
