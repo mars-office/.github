@@ -104,7 +104,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var-file="secrets.tfvars" -out=tfplan
+        run: terraform plan -no-color -input=false -var-file="secrets.tfvars" -out=./tfplan
         continue-on-error: true
         working-directory: ${{ inputs.env }}
 
@@ -172,7 +172,8 @@ jobs:
 
       - name: Convert plan to JSON
         if: ${{ inputs.tfScanDisabled == false }}
-        run: terraform show -json ${{ inputs.env }}/tfplan > ${{ inputs.env }}/tfplan.json
+        working-directory: ${{ inputs.env }}
+        run: terraform show -json tfplan > tfplan.json
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/iac@master
