@@ -185,7 +185,7 @@ jobs:
         with:
           file: ./${{ inputs.env }}/tf-plan.json
           sarif: true
-          args: --severity-threshold=high --scan=planned-values
+          args: --severity-threshold=high --scan=planned-values -f
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.tfScanDisabled == false }}
