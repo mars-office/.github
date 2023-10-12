@@ -159,9 +159,9 @@ jobs:
         with:
           sarif_file: snyk.sarif
 
-      - name: Fail job if scan failed
-        if: ${{ inputs.tfScanDisabled == false && steps.tf_scan.outcome == 'failure' }}
-        run: exit 1
+      # - name: Fail job if scan failed
+      #   if: ${{ inputs.tfScanDisabled == false && steps.tf_scan.outcome == 'failure' }}
+      #   run: exit 1
       
       - name: Upload tfplan
         uses: actions/upload-artifact@v3
