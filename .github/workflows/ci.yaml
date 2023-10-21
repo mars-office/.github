@@ -57,6 +57,10 @@ on:
         type: boolean
         required: false
         default: false
+      nameOverride:
+        type: string
+        required: false
+        default: ''
 
 env:
   HELM_EXPERIMENTAL_OCI: 1
@@ -128,7 +132,7 @@ jobs:
           platforms: ${{ inputs.dockerBuildPlatforms }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/mars-office/${{ github.event.repository.name }}:latest,ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
+          tags: ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:latest,ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:v${{ inputs.version }}
           build-args: |
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
@@ -144,7 +148,7 @@ jobs:
         with:
           sarif: true
           args: --file=${{ inputs.dockerfilePath }}/Dockerfile --severity-threshold=high --username=mars-office --password=${{ secrets.GH_TOKEN }}
-          image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
+          image: ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.dockerScanDisabled == false }}
