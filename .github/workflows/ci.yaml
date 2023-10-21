@@ -7,6 +7,10 @@ on:
         required: false
         type: string
         default: '3.11.3'
+      dockerfilePath:
+        required: false
+        type: string
+        default: '.'
       helmBuildAndPushDisabled:
         required: false
         type: boolean
@@ -120,7 +124,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: ${{ inputs.dockerPushDisabled == false }}
-          context: .
+          context: ${{ inputs.dockerfilePath }}
           platforms: ${{ inputs.dockerBuildPlatforms }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -139,7 +143,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
         with:
           sarif: true
-          args: --file=Dockerfile --severity-threshold=high --username=mars-office --password=${{ secrets.GH_TOKEN }}
+          args: --file=${{ inputs.dockerfilePath }}/Dockerfile --severity-threshold=high --username=mars-office --password=${{ secrets.GH_TOKEN }}
           image: ghcr.io/mars-office/${{ github.event.repository.name }}:v${{ inputs.version }}
 
       - name: Upload result to GitHub Code Scanning
