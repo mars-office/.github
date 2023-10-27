@@ -164,7 +164,7 @@ jobs:
           curl --location --request POST 'https://security-api.service.eu.newrelic.com/security/v1?repository=<https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}>' \
           --header 'Api-Key: ${{ secrets.NEW_RELIC_KEY }}' \
           --header 'Content-Type: application/json' \
-          --header 'X-Scanner: Trivy' \
+          --header 'X-Scanner: Trivy-TF' \
           -d @trivy-results.sarif
 
       - name: Fail job if scan failed
