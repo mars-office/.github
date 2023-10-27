@@ -45,10 +45,6 @@ on:
         type: boolean
         required: false
         default: false
-      codeScanLanguage:
-        type: string
-        required: false
-        default: 'node'
       dockerScanDisabled:
         type: boolean
         required: false
@@ -79,24 +75,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: jenseng/dynamic-uses@v1
-        continue-on-error: true
-        name: Run Snyk to check for vulnerabilities
+      - name: Run Trivy vulnerability scanner in code mode
+        uses: aquasecurity/trivy-action@master
         id: code_scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
         with:
-          uses: snyk/actions/${{ inputs.codeScanLanguage }}@master
-          with: '{ "args": "--sarif-file-output=snyk_code.sarif --severity-threshold=high" }'
+          scan-type: 'fs'
+          scanners: 'vuln,secret,config'
+          scan-ref: .
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk_code.sarif
+          sarif_file: trivy-results.sarif
 
-      # - name: Fail job if scan failed
-      #   if: ${{ steps.code_scan.outcome == 'failure' }}
-      #   run: exit 1
+      - name: Fail job if scan failed
+        if: ${{ steps.code_scan.outcome == 'failure' }}
+        run: exit 1
 
   docker_build_push:
     permissions:
@@ -137,28 +137,33 @@ jobs:
             DEPLOYABLE_VERSION=${{ inputs.version }}
             GH_TOKEN=${{secrets.GH_TOKEN}}
 
-      - name: Run Snyk to check for vulnerabilities
+      - name: Run Trivy vulnerability scanner in image mode
+        uses: aquasecurity/trivy-action@master
         if: ${{ inputs.dockerScanDisabled == false }}
-        uses: snyk/actions/docker@master
-        continue-on-error: true
         id: docker_scan
+        continue-on-error: true
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
+          TRIVY_USERNAME: mars-office
+          TRIVY_PASSWORD: ${{secrets.GH_TOKEN}}
         with:
-          sarif: true
-          args: --file=${{ inputs.dockerfilePath }}/Dockerfile --severity-threshold=high --username=mars-office --password=${{ secrets.GH_TOKEN }}
-          image: ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:v${{ inputs.version }}
+          scan-type: 'image'
+          scanners: 'vuln,secret,config'
+          image-ref: ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:v${{ inputs.version }}
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.dockerScanDisabled == false }}
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk.sarif
+          sarif_file: 'trivy-results.sarif'
 
-      # - name: Fail job if scan failed
-      #   if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
-      #   run: exit 1
+      - name: Fail job if scan failed
+        if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
+        run: exit 1
       
   helm_build_push:
     permissions:
@@ -208,27 +213,30 @@ jobs:
         working-directory: ${{ inputs.helmChartPath }}
         id: template
 
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/iac@master
-        continue-on-error: true
+      - name: Run Trivy vulnerability scanner in IaC mode
         if: ${{ inputs.helmScanDisabled == false }}
+        uses: aquasecurity/trivy-action@master
         id: helm_scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
         with:
-          file: ${{ inputs.helmChartPath }}/output.yaml
-          sarif: true
-          args: --severity-threshold=high
+          scan-type: 'config'
+          scan-ref: ${{ inputs.helmChartPath }}
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          scanners: 'vuln,secret,config'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.helmScanDisabled == false }}
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk.sarif
+          sarif_file: 'trivy-results.sarif'
 
-      # - name: Fail job if scan failed
-      #   if: ${{ inputs.helmScanDisabled == false && steps.helm_scan.outcome == 'failure' }}
-      #   run: exit 1
+      - name: Fail job if scan failed
+        if: ${{ inputs.helmScanDisabled == false && steps.helm_scan.outcome == 'failure' }}
+        run: exit 1
 
       - name: Package Chart
         run: helm package --version ${{ inputs.version }} --app-version v${{ inputs.version }} .
