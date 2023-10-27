@@ -136,11 +136,6 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: Convert plan to JSON
-        if: ${{ inputs.tfScanDisabled == false }}
-        working-directory: ${{ inputs.env }}
-        run: terraform show -json tfplan > tf-plan.json
-
       - name: Run Trivy vulnerability scanner in IaC mode
         if: ${{ inputs.tfScanDisabled == false }}
         uses: aquasecurity/trivy-action@master

@@ -220,11 +220,6 @@ jobs:
         working-directory: ${{ inputs.helmChartPath }}
         id: lint
 
-      - name: Template Chart
-        run: helm template . > ./output.yaml
-        working-directory: ${{ inputs.helmChartPath }}
-        id: template
-
       - name: Run Trivy vulnerability scanner in IaC mode
         if: ${{ inputs.helmScanDisabled == false }}
         uses: aquasecurity/trivy-action@master
