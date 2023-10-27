@@ -152,7 +152,6 @@ jobs:
           hide-progress: false
           format: 'sarif'
           output: 'trivy-results.sarif'
-          scanners: 'vuln,secret,config'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
