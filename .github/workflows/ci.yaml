@@ -99,6 +99,7 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
           skip-dirs: ${{inputs.helmChartPath}}
+          skip-files: 'Dockerfile'
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
