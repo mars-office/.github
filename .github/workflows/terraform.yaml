@@ -9,7 +9,7 @@ on:
       tfVersion:
         required: false
         type: string
-        default: '1.5.7'
+        default: '1.6.2'
       tfScanDisabled:
         required: false
         type: boolean

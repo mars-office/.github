@@ -6,7 +6,7 @@ on:
       helmVersion:
         required: false
         type: string
-        default: '3.11.3'
+        default: '3.13.1'
       dockerfilePath:
         required: false
         type: string
