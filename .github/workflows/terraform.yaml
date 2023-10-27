@@ -141,27 +141,30 @@ jobs:
         working-directory: ${{ inputs.env }}
         run: terraform show -json tfplan > tf-plan.json
 
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/iac@master
-        continue-on-error: true
+      - name: Run Trivy vulnerability scanner in IaC mode
         if: ${{ inputs.tfScanDisabled == false }}
+        uses: aquasecurity/trivy-action@master
         id: tf_scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
         with:
-          file: ${{ inputs.env }}
-          sarif: true
-          args: --severity-threshold=high --scan=resource-changes
+          scan-type: 'config'
+          scan-ref: ${{ inputs.env }}
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.tfScanDisabled == false }}
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: snyk.sarif
+          sarif_file: trivy-results.sarif
 
-      # - name: Fail job if scan failed
-      #   if: ${{ inputs.tfScanDisabled == false && steps.tf_scan.outcome == 'failure' }}
-      #   run: exit 1
+      - name: Fail job if scan failed
+        if: ${{ inputs.tfScanDisabled == false && steps.tf_scan.outcome == 'failure' }}
+        run: exit 1
       
       - name: Upload tfplan
         uses: actions/upload-artifact@v3
