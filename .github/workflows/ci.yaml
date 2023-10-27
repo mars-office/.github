@@ -104,11 +104,13 @@ jobs:
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
+        if: ${{ ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         with:
           sarif_file: trivy-results.sarif
 
       - name: Upload sarif to New Relic
+        if: ${{ ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         run: |
           curl --location --request POST 'https://security-api.service.eu.newrelic.com/security/v1?repository=<https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}>' \
@@ -179,14 +181,14 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
-        if: ${{ inputs.dockerScanDisabled == false }}
+        if: ${{ inputs.dockerScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         uses: github/codeql-action/upload-sarif@v2
         continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
 
       - name: Upload sarif to New Relic
-        if: ${{ inputs.dockerScanDisabled == false }}
+        if: ${{ inputs.dockerScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         run: |
           curl --location --request POST 'https://security-api.service.eu.newrelic.com/security/v1?repository=<https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}>' \
@@ -257,14 +259,14 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload result to GitHub Code Scanning
-        if: ${{ inputs.helmScanDisabled == false }}
+        if: ${{ inputs.helmScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
 
       - name: Upload sarif to New Relic
-        if: ${{ inputs.helmScanDisabled == false }}
+        if: ${{ inputs.helmScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         run: |
           curl --location --request POST 'https://security-api.service.eu.newrelic.com/security/v1?repository=<https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}>' \
@@ -284,7 +286,7 @@ jobs:
       
       - name: Helm Push
         id: push
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') }}
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
         run: |
           helm push ${{ inputs.helmChartPath }}/*.tgz oci://ghcr.io/${{ github.repository_owner }}
 
@@ -296,7 +298,7 @@ jobs:
       contents: read
       packages: write
     concurrency: ${{ inputs.umbrellaChartName }}
-    if: ${{ inputs.updateUmbrellaChartDisabled == false && inputs.helmBuildAndPushDisabled == false && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')) }}
+    if: ${{ inputs.updateUmbrellaChartDisabled == false && inputs.helmBuildAndPushDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
     needs: [helm_build_push, docker_build_push, code_scan]
     runs-on: ubuntu-latest
     steps:
