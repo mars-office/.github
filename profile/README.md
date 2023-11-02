@@ -7,8 +7,7 @@ NewRelic: https://one.eu.newrelic.com/logger?account=3912344
 Wiki: https://github.com/mars-office/.github/wiki   
 Styra DAS (OPA): https://0e03ik.svc.styra.com/  
 Telepresence (Ambassador Cloud): https://app.getambassador.io/cloud/home/dashboard  
-Make: https://eu1.make.com/organization/247666/dashboard  
-N8N: https://n8n.dev.marsconceptor.com/  
+Shuffler SOAR: https://shuffler.io/workflows  
   
 # Huna  
 GCP Project: https://console.cloud.google.com/welcome?project=huna-2  
