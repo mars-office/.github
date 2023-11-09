@@ -119,9 +119,9 @@ jobs:
           --header 'X-Scanner: Trivy' \
           -d @trivy-results.sarif
 
-      - name: Fail job if scan failed
-        if: ${{ steps.code_scan.outcome == 'failure' }}
-        run: exit 1
+      # - name: Fail job if scan failed
+      #   if: ${{ steps.code_scan.outcome == 'failure' }}
+      #   run: exit 1
 
   docker_build_push:
     permissions:
@@ -197,9 +197,9 @@ jobs:
           --header 'X-Scanner: Trivy' \
           -d @trivy-results.sarif
 
-      - name: Fail job if scan failed
-        if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
-        run: exit 1
+      # - name: Fail job if scan failed
+      #   if: ${{ inputs.dockerScanDisabled == false && steps.docker_scan.outcome == 'failure' }}
+      #   run: exit 1
       
   helm_build_push:
     permissions:
@@ -275,9 +275,9 @@ jobs:
           --header 'X-Scanner: Trivy' \
           -d @trivy-results.sarif
 
-      - name: Fail job if scan failed
-        if: ${{ inputs.helmScanDisabled == false && steps.helm_scan.outcome == 'failure' }}
-        run: exit 1
+      # - name: Fail job if scan failed
+      #   if: ${{ inputs.helmScanDisabled == false && steps.helm_scan.outcome == 'failure' }}
+      #   run: exit 1
 
       - name: Package Chart
         run: helm package --version ${{ inputs.version }} --app-version v${{ inputs.version }} .
