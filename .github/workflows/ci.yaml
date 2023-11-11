@@ -239,8 +239,8 @@ jobs:
         run: |
           REPOS=$(grep -oP '(?<=repository: ).*' "./Chart.lock")
           for repo in $REPOS; do
-            if [[ "$repo_name" == "oci://"* ]]; then
-              echo "Skipping repository $repo_name (starts with 'oci://')"
+            if [[ "$repo" == "oci://"* ]]; then
+              echo "Skipping repository $repo (starts with 'oci://')"
               continue
             fi
             repo_name=$(basename "$repo")
