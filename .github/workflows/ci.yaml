@@ -220,9 +220,6 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
 
-      - uses: chrisdickinson/setup-yq@latest
-        name: Install yq
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -241,7 +238,7 @@ jobs:
         continue-on-error: true
         run: |
           if [ -f "./Chart.lock" ]; then
-            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh
+            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' ./Chart.lock
           fi
           
       - name: Build Chart Dependencies
