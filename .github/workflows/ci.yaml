@@ -237,9 +237,7 @@ jobs:
       - name: Add missing Helm repos if needed
         continue-on-error: true
         run: |
-          if [ -f "./Chart.lock" ]; then
-            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh;
-          fi
+          yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh
           
       - name: Build Chart Dependencies
         run: helm dependency build
