@@ -233,9 +233,20 @@ jobs:
         id: login
         run: |
           echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+
+      - name: Add missing Helm repos if needed
+        continue-on-error: true
+        run: |
+          repo_urls=$(yq eval '.dependencies[*].repository' ./Chart.lock)
+          IFS=$'\n'
+          for url in $repo_urls; do
+            helm repo add "$(basename $url)" $url
+          done
+          helm repo update
+    
           
       - name: Build Chart Dependencies
-        run: helm dependency update
+        run: helm dependency build
         continue-on-error: true
         id: update
         working-directory: ${{ inputs.helmChartPath }}
