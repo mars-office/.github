@@ -238,7 +238,7 @@ jobs:
         continue-on-error: true
         run: |
           if [ -f "./Chart.lock" ]; then
-            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh
+            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh;
           fi
           
       - name: Build Chart Dependencies
