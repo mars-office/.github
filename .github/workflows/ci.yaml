@@ -234,8 +234,16 @@ jobs:
         run: |
           echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
 
-      - name: Update Chart Dependencies
-        run: helm dependency update
+      - name: Add missing Helm repos if needed
+        continue-on-error: true
+        run: |
+          if [ -f "./Chart.lock" ]; then
+            yq --indent 0 '.dependencies | map(["helm", "repo", "add", .name, .repository] | join(" ")) | .[]' "./Chart.lock"  | sh --;
+          fi
+          
+      - name: Build Chart Dependencies
+        run: helm dependency build
+        continue-on-error: true
         id: update
         working-directory: ${{ inputs.helmChartPath }}
 
@@ -257,7 +265,6 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
-          skip-dirs: 'charts'
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.helmScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
