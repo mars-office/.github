@@ -220,6 +220,9 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
         id: install
 
+      - uses: chrisdickinson/setup-yq@latest
+        name: Install yq
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -237,7 +240,9 @@ jobs:
       - name: Add missing Helm repos if needed
         continue-on-error: true
         run: |
-          yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh
+          if [ -f "./Chart.lock" ]; then
+            yq -r '.dependencies[] | "helm repo add \(.name) \(.repository)"' Chart.lock | sh
+          fi
           
       - name: Build Chart Dependencies
         run: helm dependency build
