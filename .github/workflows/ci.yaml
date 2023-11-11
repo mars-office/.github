@@ -237,10 +237,10 @@ jobs:
       - name: Add missing Helm repos if needed
         continue-on-error: true
         run: |
-          repo_urls=$(yq eval '.dependencies[*].repository' ./Chart.lock)
-          IFS=$'\n'
-          for url in $repo_urls; do
-            helm repo add "$(basename $url)" $url
+          REPOS=$(grep -oP '(?<=repository: ).*' "./Chart.lock")
+          for repo in $REPOS; do
+            repo_name=$(basename "$repo")
+            helm repo add "$repo_name" "$repo"
           done
           helm repo update
     
