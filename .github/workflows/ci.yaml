@@ -236,18 +236,20 @@ jobs:
 
       - name: Add missing Helm repos if needed
         continue-on-error: true
+        working-directory: ${{inputs.helmChartPath}}
         run: |
-          REPOS=$(grep -oP '(?<=repository: ).*' "./Chart.lock")
-          for repo in $REPOS; do
-            if [[ "$repo" == "oci://"* ]]; then
-              echo "Skipping repository $repo (starts with 'oci://')"
-              continue
-            fi
-            repo_name=$(basename "$repo")
-            helm repo add "$repo_name" "$repo"
-          done
-          helm repo update
-    
+          if test -f "./Chart.lock"; then
+            REPOS=$(grep -oP '(?<=repository: ).*' "./Chart.lock")
+            for repo in $REPOS; do
+              if [[ "$repo" == "oci://"* ]]; then
+                echo "Skipping repository $repo (starts with 'oci://')"
+                continue
+              fi
+              repo_name=$(basename "$repo")
+              helm repo add "$repo_name" "$repo"
+            done
+            helm repo update
+          fi
           
       - name: Build Chart Dependencies
         run: helm dependency build
