@@ -252,7 +252,7 @@ jobs:
           fi
           
       - name: Build Chart Dependencies
-        run: helm dependency build
+        run: helm dependency build --skip-refresh
         continue-on-error: true
         id: update
         working-directory: ${{ inputs.helmChartPath }}
