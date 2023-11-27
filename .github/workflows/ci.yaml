@@ -233,26 +233,9 @@ jobs:
         id: login
         run: |
           echo ${{ secrets.GH_TOKEN }} | helm registry login ghcr.io --username ${{ github.repository_owner }} --password-stdin
-
-      - name: Add missing Helm repos if needed
-        continue-on-error: true
-        working-directory: ${{inputs.helmChartPath}}
-        run: |
-          if test -f "./Chart.lock"; then
-            REPOS=$(grep -oP '(?<=repository: ).*' "./Chart.lock")
-            for repo in $REPOS; do
-              if [[ "$repo" == "oci://"* ]]; then
-                echo "Skipping repository $repo (starts with 'oci://')"
-                continue
-              fi
-              repo_name=$(basename "$repo")
-              helm repo add "$repo_name" "$repo"
-            done
-            helm repo update
-          fi
           
       - name: Build Chart Dependencies
-        run: helm dependency build --skip-refresh
+        run: helm dependency update --skip-refresh
         continue-on-error: true
         id: update
         working-directory: ${{ inputs.helmChartPath }}
