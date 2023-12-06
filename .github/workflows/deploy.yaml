@@ -70,7 +70,7 @@ jobs:
       - name: Helm upgrade
         if: inputs.operation == 'upgrade'
         run: |
-            helm upgrade --install --create-namespace --atomic --namespace ${{ inputs.namespace }} --version ${{ inputs.version }} --values values-${{ inputs.env }}.yaml --values Chart.lock ${{ inputs.chartName }} oci://ghcr.io/mars-office/${{ inputs.chartName }}
+            helm upgrade --install --create-namespace --atomic --namespace ${{ inputs.namespace }} --version ${{ inputs.version }} --values values-${{ inputs.env }}.yaml ${{ inputs.chartName }} oci://ghcr.io/mars-office/${{ inputs.chartName }}
       
       - name: Helm uninstall
         if: inputs.operation == 'uninstall'
