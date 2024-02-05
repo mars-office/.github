@@ -27,13 +27,13 @@ jobs:
     environment: ${{ inputs.env }}
     steps:
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ inputs.tfVersion }}
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TEAM_TOKEN }}
       
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure Terraform plugin cache
         run: |
@@ -41,7 +41,7 @@ jobs:
           mkdir -p ~/.terraform.d/plugin-cache
 
       - name: Cache Terraform
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
@@ -75,7 +75,7 @@ jobs:
         run: exit 1
       
       - name: Upload tfplan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tfplan
           path: ${{ inputs.env }}/tfplan
@@ -95,13 +95,13 @@ jobs:
     environment: approval
     steps:
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ inputs.tfVersion }}
           cli_config_credentials_token: ${{ secrets.TERRAFORM_TEAM_TOKEN }}
       
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure Terraform plugin cache
         run: |
@@ -109,14 +109,14 @@ jobs:
           mkdir -p ~/.terraform.d/plugin-cache
           
       - name: Cache Terraform
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
           restore-keys: ${{ runner.os }}-terraform-
 
       - name: Download tfplan
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: ${{ inputs.env }}

@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
         uses: aquasecurity/trivy-action@master
@@ -103,7 +103,7 @@ jobs:
           skip-files: 'Dockerfile'
 
       - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: ${{ ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
         with:
@@ -134,23 +134,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+        with:
+          cleanup: false
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Build and Push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           push: ${{ inputs.dockerPushDisabled == false }}
           context: ${{ inputs.dockerfilePath }}
@@ -182,7 +186,7 @@ jobs:
 
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.dockerScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         continue-on-error: true
         with:
           sarif_file: 'trivy-results.sarif'
@@ -221,7 +225,7 @@ jobs:
         id: install
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get chart name
         id: getChartName
@@ -263,7 +267,7 @@ jobs:
       - name: Upload result to GitHub Code Scanning
         if: ${{ inputs.helmScanDisabled == false && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main') }}
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -312,7 +316,7 @@ jobs:
         id: install
 
       - name: Checkout umbrella
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'mars-office/${{inputs.umbrellaChartName}}'
           ref: 'main'
@@ -320,7 +324,7 @@ jobs:
           path: 'umbrella'
 
       - name: Checkout self
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: 'subchart'
       
