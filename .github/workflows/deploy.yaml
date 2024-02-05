@@ -6,7 +6,7 @@ on:
       helmVersion:
         required: false
         type: string
-        default: '3.11.3'
+        default: '3.14.0'
       chartName:
         required: true
         type: string
