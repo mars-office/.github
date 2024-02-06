@@ -149,14 +149,22 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
+      - name: GitHub Actions Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Build and Push
         uses: docker/build-push-action@v5
         with:
           push: ${{ inputs.dockerPushDisabled == false }}
           context: ${{ inputs.dockerfilePath }}
           platforms: ${{ inputs.dockerBuildPlatforms }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           tags: ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:latest,ghcr.io/mars-office/${{ inputs.nameOverride == '' && github.event.repository.name || inputs.nameOverride }}:v${{ inputs.version }}
           build-args: |
             DEPLOYABLE_VERSION=${{ inputs.version }}
