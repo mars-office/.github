@@ -27,7 +27,6 @@ jobs:
   deploy:
     concurrency:
       group: ${{ inputs.chartName }}-${{ inputs.env }}
-      cancel-in-progress: ${{ inputs.env != 'dev' }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
     steps:
