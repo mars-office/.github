@@ -48,8 +48,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
-          restore-keys: ${{ runner.os }}-terraform-
+          key: ${{ runner.os }}-terraform-${{ inputs.env }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
+          restore-keys: ${{ runner.os }}-terraform-${{ inputs.env }}-
 
       - name: Substitute Secrets
         uses: Lambdaspire/action-substitute-secrets-in-file@main
@@ -208,8 +208,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
-          restore-keys: ${{ runner.os }}-terraform-
+          key: ${{ runner.os }}-terraform-${{ inputs.env }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', inputs.env)) }}
+          restore-keys: ${{ runner.os }}-terraform-${{ inputs.env }}-
 
       - name: Download tfplan
         uses: actions/download-artifact@v4
