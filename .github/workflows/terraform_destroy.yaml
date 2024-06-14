@@ -9,7 +9,7 @@ on:
       tfVersion:
         required: false
         type: string
-        default: '1.6.2'
+        default: '1.8.5'
 
 env:
   TF_IN_AUTOMATION: 'true'
